@@ -15,4 +15,3 @@ url = 'https://csf101-server-cap1.onrender.com/get/input/372'
 plain_text = url_to_text_with_re(url)
 
 print(plain_text)
-
