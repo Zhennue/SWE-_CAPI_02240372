@@ -58,151 +58,83 @@ python Spelling Checker.py my_passage.txt
 -An additional step is a language-dependent algorithm for handling morphology.
 
 
-
 ## Data Structures
-1. Set - Dictionary Data Structure
-Purpose: The set is used to store the dictionary of valid words.
+-⁠dzongkha_spell_checker.py
+Set: For storing unique reference words from the cleaned dictionary for fast lookup.
+List: For holding words extracted from each line of the input file during iteration.
+String: For handling and processing the lines read from the input file.
 
-Why Chosen:
-Fast Lookup: The set in Python offers O(1) average time complexity for membership testing (i.e., checking if a word exists in the dictionary). This is crucial for spelling checking, as we need to quickly verify whether a word is valid or misspelled.
+-⁠txt conveter.py
+Strings: For storing file names and the content extracted from the .docx file.
 
-Uniqueness: A set automatically ensures that there are no duplicate words in the dictionary, which simplifies the process.
+-⁠txt downloader.py
+Strings: For storing the URL and the text content of the HTTP response.
 
-Case Insensitivity: The dictionary is stored in lowercase, allowing case-insensitive comparison with the words in the passage.
-
-Example:
-dictionary = {"འབྱུང", "གུང", "འཕུང", "དོན", "ཞིང", "བཟོ"}
-
-
-2. List - Passage Data Structure
-Purpose: The list is used to store the lines of text from the passage that will be checked for spelling errors.
-
-Why Chosen:
-Order Preservation: A list preserves the order of the lines and words, which is essential for reporting the position of misspelled words in the passage.
-
-Efficient Iteration: It allows for easy iteration over the lines (or words) of the passage. Each line can be processed independently, checking for misspelled words in sequence.
-
-Simplicity: A list is a simple and effective way to store multiple lines of text that need to be processed one by one.
-
-Example:
-passage = [
-    "དོན་ལུས་དགོས་པའི་འདོད་ཡོངས",
-    "འདོགས་འཕུང་།",
-    "ཞིང་བཟོ་ལས་དང་གསོལ"
-]
+-cleaner.py
+Strings: For storing file names and the content of each line from the input file.
 
 
-3. List of Tuples - Misspelled Words
-Purpose: The list of tuples stores information about the misspelled words found in the passage. Each tuple contains the line number, word position, and the misspelled word itself.
 
-Why Chosen:
-Organized Data: The tuple stores multiple related pieces of information together (line number, word position, misspelled word). This is an efficient way to keep track of misspelled words along with their context.
-
-Readability: Using a list allows for easy collection of all misspelled words across the passage. The tuples provide a clear structure to store the detailed information about the misspelled word.
-
-Indexing: The list can be easily iterated to report each misspelled word along with its exact location (line and position).
-
-Example:
-misspelled_words = [
-    (2, 1, "དད"),
-    (3, 2, "དོད")
-]
-
-
-4. Dictionary - Suggested Corrections
-Purpose: The dictionary (in Python) is used to store suggested corrections for each misspelled word. The key is the misspelled word, and the value is the suggested correct word.
-
-Why Chosen:
-Fast Lookup for Suggestions: Like the dictionary, the suggested corrections are stored in a dictionary for fast lookup. This allows you to quickly retrieve the most appropriate correction for each misspelled word.
-
-Easy Mapping: The key-value structure of a dictionary allows for a clear mapping between the incorrect word (key) and its suggested correction (value). This is simple to manage and efficient for spell-checking tasks.
-
-Example:
-suggested_corrections = {
-    "དད": "དོད",
-    "དོད": "དོན"
-}
-
-
-5. String - File Paths
-
-Purpose: The string is used to represent the file paths for both the passage file and the dictionary file.
-
-Why Chosen:
-Simplicity: File paths are naturally represented as strings in Python, and this allows for easy manipulation and passing of file locations to functions.
-
-Flexibility: By using a string, the paths can be easily modified or passed as command-line arguments, making the tool flexible for various file locations.
-
-Example:
-passage_file = "my_passage.txt"
-dictionary_file = "cleaned_dzongkha_dictionary.txt"
 
 ## Algorithms
-Dictionary Loading: Loads words from a dictionary file into a set for fast membership testing, ensuring case-insensitive lookups.
+1.Loading the Dictionary (load_dictionary)
+-Reads a dictionary file, where each word is assumed to be on a new line.
+-Converts all words to lowercase to make the spelling check case-insensitive.
+-Stores the words in a set, which allows for O(1) lookup time when checking for misspelled words.
 
-Passage Parsing: Reads the passage file line by line, splitting each line into words using regular expressions to handle punctuation.
+2.Finding Misspelled Words (find_misspelled_words)
+-Uses re.findall to extract all the words from a line using the regex pattern r'\b\w+\b'. This pattern matches word boundaries (\b) and sequences of word characters (\w+), effectively splitting the line into words.
+-Converts each word to lowercase for case-insensitive comparison.
+-For each word, checks if it exists in the dictionary:
+-If not, appends a tuple containing the line number, position, and the misspelled word to the misspelled list.
 
-Spelling Check: Compares each word in the passage to the dictionary. If a word is not found in the dictionary, it's flagged as misspelled.
+3.Checking the Entire Passage (check_spelling)
+-Reads the passage file line by line.
+-Calls find_misspelled_words for each line, storing all misspelled words with their line numbers and positions.
 
-Misspelled Word Tracking: Misspelled words are stored in a list of tuples, containing the line number, word position, and the word itself.
-
-Integration: Combines dictionary loading, passage parsing, and spelling checking to display misspelled words and their locations in the passage.
+4.Displaying Results (display_results)
+-If any misspelled words are found, it prints the line number, word position, and the misspelled word.
+-If no misspelled words are found, it prints "No misspelled words found."
 
 
 ## Performance Analysis
+1. load_dictionary Function
+Performance: The load_dictionary function reads a file line by line and adds each word (after stripping and lowering the case) into a set.
+Complexity: O(n), where n is the number of words in the dictionary file. Sets provide O(1) time complexity for lookups, so loading the dictionary is efficient.
 
-Dictionary Loading: Loading the dictionary into a set takes O(n) time, where n is the number of words in the dictionary. This is efficient due to the O(1) average time complexity for lookups in a set.
+2. find_misspelled_words Function
+Performance: Regular expressions are powerful but can be costly in terms of performance for large texts. The complexity depends on the size of the line and the pattern. Generally, re.findall is O(m) where m is the length of the line, but regex can take longer based on the complexity of the expression.
 
-Passage Parsing: Parsing the passage line by line and extracting words using regular expressions takes O(m * k), where m is the number of lines and k is the average number of words per line.
+3. check_spelling Function
+Performance:
+The function reads all lines of the file into memory using file.readlines(), which has a time complexity of O(n) where n is the number of lines in the file.
 
-Spelling Check: Checking each word against the dictionary is done in O(1) for each word, so the overall time complexity for spelling checks is O(m * k).
+4. re.findall and Its Impact
+re.findall(r'\b\w+\b', line.lower()):
+This regular expression is efficient for finding word boundaries. However, if the text contains many non-alphanumeric characters, the performance can degrade slightly because the engine needs to evaluate the boundaries for every character in the string.
+In typical use cases with moderate text sizes, this performance impact is usually negligible. But for very large files, this could become a bottleneck.
+
+5. Displaying Results
+The display_results function simply iterates through the list of misspelled words and prints them.
+Performance: If there are k misspelled words, the complexity is O(k), but this is typically very fast.
+
+
 
 
 ## Challenges and Solutions
+1.Python did not read request so i changed the code using def 
+2.Linking the dictionary and passage was not working but by making it variable and using main function it worked (main(dictionary_file, passage_file)
 
-1. Handling Large Files:
-Challenge: Large passage or dictionary files can slow down the process.
 
-Solution: Using sets for the dictionary ensures O(1) lookup time, making word checks faster even with large files. Additionally, processing files line by line avoids loading the entire file into memory at once.
-
-2. Case Sensitivity:
-Challenge: Spelling errors can appear due to case mismatches.
-
-Solution: Convert both the passage words and dictionary to lowercase to perform case-insensitive comparison.
-
-3. Punctuation and Special Characters:
-Challenge: Words may include punctuation or special characters, leading to false mismatches.
-
-Solution: Use regular expressions to extract words while ignoring punctuation, ensuring accurate word matching.
-
-4. Accuracy of Suggestions:
-Challenge: Providing accurate spelling corrections can be difficult, especially for similar-looking words.
-
-Solution: While not implemented in full here, integrating a probabilistic spelling correction algorithm (e.g., using edit distance or machine learning models) can improve correction accuracy.
-
-5. Encoding Issues:
-Challenge: Non-standard characters (like Dzongkha) may cause encoding problems.
-
-Solution: Use UTF-8 encoding when reading files to ensure compatibility with non-English characters.
 
 
 ## Future Improvements
-1. Enhanced Correction Suggestions:
-Implement more sophisticated spelling correction algorithms (e.g., Levenshtein distance or probabilistic models) to provide more accurate suggestions for misspelled words.
+1.Word's AutoCorrect feature is useful for checking spelling and grammar. When Word indicates a word in a document with a squiggle that it may be misspelt or incorrect, you can right-click the word to see suggestions.
 
-2. Support for Multiple Languages:
-Extend the tool to support multi-language dictionaries, enabling the checker to work with different languages or mixed-language passages.
-
-3. GUI or Web Interface:
-Develop a Graphical User Interface (GUI) or web application to make the tool more user-friendly, allowing users to upload files and see spelling suggestions interactively.
-
-4. Performance Optimization:
-For large files, consider implementing parallel processing or streaming to process the text more efficiently, especially for dictionaries with millions of words.
-
-5. Integration with Text Editors:
-Integrate the tool with popular text editors or IDEs (e.g., VSCode, Sublime Text) for real-time spell checking as users type.
 
 
 ## References
-1. [Download Files From a URL Using Python](https://www.youtube.com/watch?v=LyymFN9t4kw)
-2. [Dictionary](https://www.youtube.com/watch?v=MZZSMaEAC2g)
+1.(Docx to text converter) - https://www.youtube.com/watch?v=Mi3j54ZMxOc
+2.(English word cleaner) - https://www.youtube.com/watch?v=hhjn4HVEdy0
+3.(Spelling checker) - https://www.youtube.com/watch?v=_nkQd9SyEpw
+4.(Algorithms of spelling checker) - https://www.youtube.com/watch?v=d-Eq6x1yssU
