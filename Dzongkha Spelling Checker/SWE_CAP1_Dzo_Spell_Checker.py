@@ -76,8 +76,6 @@ print(f"English words, punctuation, numbers, and brackets have been removed. Cle
 
 #Main Spell Checking function
 import re
-
-import re
 import difflib
 
 def load_dictionary(file_path):
